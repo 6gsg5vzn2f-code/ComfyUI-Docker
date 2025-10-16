@@ -22,7 +22,7 @@ mkdir -p "$CFG_DIR"
 
 if [ ! -f "$CFG_FILE" ]; then
   echo "↳ Creating ComfyUI-Manager config.ini (uv OFF, no file logging, DB cache)"
-  cat > "$CFG_FILE" <<EOF
+  cat >"$CFG_FILE" <<EOF
 [default]
 use_uv = False
 file_logging = False
@@ -32,27 +32,26 @@ EOF
 else
   echo "↳ Updating ComfyUI-Manager config.ini (uv OFF, no file logging, DB cache)"
   # use_uv = False
-  grep -q '^use_uv' "$CFG_FILE" \
-    && sed -i 's/^use_uv.*/use_uv = False/' "$CFG_FILE" \
-    || printf '\nuse_uv = False\n' >> "$CFG_FILE"
+  grep -q '^use_uv' "$CFG_FILE" &&
+    sed -i 's/^use_uv.*/use_uv = False/' "$CFG_FILE" ||
+    printf '\nuse_uv = False\n' >>"$CFG_FILE"
 
   # file_logging = False (and drop any existing log_path line)
-  grep -q '^file_logging' "$CFG_FILE" \
-    && sed -i 's/^file_logging.*/file_logging = False/' "$CFG_FILE" \
-    || printf '\nfile_logging = False\n' >> "$CFG_FILE"
+  grep -q '^file_logging' "$CFG_FILE" &&
+    sed -i 's/^file_logging.*/file_logging = False/' "$CFG_FILE" ||
+    printf '\nfile_logging = False\n' >>"$CFG_FILE"
   sed -i '/^log_path[[:space:]=]/d' "$CFG_FILE" || true
 
   # db_mode = cache (prevents file DB usage)
-  grep -q '^db_mode' "$CFG_FILE" \
-    && sed -i 's/^db_mode.*/db_mode = cache/' "$CFG_FILE" \
-    || printf '\ndb_mode = cache\n' >> "$CFG_FILE"
+  grep -q '^db_mode' "$CFG_FILE" &&
+    sed -i 's/^db_mode.*/db_mode = cache/' "$CFG_FILE" ||
+    printf '\ndb_mode = cache\n' >>"$CFG_FILE"
 
   # Provide a safe DB URL anyway (future-proof if Manager flips off cache)
-  grep -q '^database_url' "$CFG_FILE" \
-    && sed -i "s|^database_url.*|database_url = ${SQLITE_URL}|" "$CFG_FILE" \
-    || printf "database_url = ${SQLITE_URL}\n" >> "$CFG_FILE"
+  grep -q '^database_url' "$CFG_FILE" &&
+    sed -i "s|^database_url.*|database_url = ${SQLITE_URL}|" "$CFG_FILE" ||
+    printf "database_url = ${SQLITE_URL}\n" >>"$CFG_FILE"
 fi
-
 
 # --- Prepare custom nodes ---
 CN_DIR=/app/ComfyUI/custom_nodes
@@ -60,11 +59,6 @@ INIT_MARKER="$CN_DIR/.custom_nodes_initialized"
 
 declare -A REPOS=(
   ["ComfyUI-Manager"]="https://github.com/ltdrdata/ComfyUI-Manager.git"
-  ["ComfyUI_essentials"]="https://github.com/cubiq/ComfyUI_essentials.git"
-  ["ComfyUI-Crystools"]="https://github.com/crystian/ComfyUI-Crystools.git"
-  ["rgthree-comfy"]="https://github.com/rgthree/rgthree-comfy.git"
-  ["ComfyUI-KJNodes"]="https://github.com/kijai/ComfyUI-KJNodes.git"
-  ["ComfyUI_UltimateSDUpscale"]="https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git"
 )
 
 if [ ! -f "$INIT_MARKER" ]; then
@@ -98,3 +92,4 @@ fi
 
 echo "↳ Launching ComfyUI"
 exec "$@"
+
