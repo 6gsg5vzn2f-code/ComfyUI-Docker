@@ -1,6 +1,7 @@
 # Script environment variables
+# YAML env 不执行 shell
 env:
-  DOCKER_IMAGE_NAME: $echo(${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+  REPOSITORY_NAME: ${{ github.repository }}
   DOCKER_REGISTRY: ghcr.io
 
 name: Build and Push Docker Image
@@ -20,6 +21,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set lowercase image name
+        run: |
+          DOCKER_IMAGE_NAME=$(echo "${REPOSITORY_NAME}" | tr '[:upper:]' '[:lower:]')
+          echo "DOCKER_IMAGE_NAME=$DOCKER_IMAGE_NAME" >> $GITHUB_ENV
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
