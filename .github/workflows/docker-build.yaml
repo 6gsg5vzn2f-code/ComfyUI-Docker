@@ -1,6 +1,6 @@
 # Script environment variables
 env:
-  DOCKER_IMAGE_NAME: ${{ github.repository }}
+  DOCKER_IMAGE_NAME: $echo(${{ github.repository }} | tr '[:upper:]' '[:lower:]')
   DOCKER_REGISTRY: ghcr.io
 
 name: Build and Push Docker Image
